@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { handleSelectCell } from "../../../gridSlice";
-import { IdOnlyProps } from "../../../Interfaces/IdOnlyProps";
+import { IdOnlyProps } from "../../../Interface/IdOnlyProps";
 import { MouseEventHandler } from "react";
 import { selectIsSelected } from "../../../State/Selectors/CellSelectors";
 

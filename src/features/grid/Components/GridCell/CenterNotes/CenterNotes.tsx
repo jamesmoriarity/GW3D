@@ -1,6 +1,7 @@
 import { useAppSelector } from "../../../../../app/hooks";
 import { selectCellCenterNotes } from "../../../State/Selectors/CellSelectors";
-import { IdOnlyProps } from "../../../Interfaces/IdOnlyProps";
+import { IdOnlyProps } from "../../../Interface/IdOnlyProps";
+
 
 export const baseClassName:string = "cell-center-values"
 export function CenterNotes(props: IdOnlyProps) {

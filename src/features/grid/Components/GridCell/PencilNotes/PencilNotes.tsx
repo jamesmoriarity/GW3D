@@ -1,6 +1,6 @@
 import { useAppSelector } from "../../../../../app/hooks";
 import { selectCellPencilNotes } from "../../../State/Selectors/CellSelectors";
-import { IdOnlyProps } from "../../../Interfaces/IdOnlyProps";
+import { IdOnlyProps } from "../../../Interface/IdOnlyProps";
 
 export function PencilNotes(props: IdOnlyProps) {
   const pencils: number[] = useAppSelector((state) =>
