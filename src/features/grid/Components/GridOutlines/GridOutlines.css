@@ -1,0 +1,136 @@
+/* SASS */
+.outlines {
+  fill: black;
+}
+
+.cell-lines {
+  fill: gray;
+}
+.cell-lines .cell-lines-horizontal > rect {
+  height: 2px;
+  width: 720px;
+}
+.cell-lines .cell-lines-vertical > rect {
+  height: 720px;
+  width: 2px;
+}
+
+.cell-lines-horizontal rect:nth-child(1) {
+  transform: translateY(0px);
+}
+
+.cell-lines-horizontal rect:nth-child(2) {
+  transform: translateY(80px);
+}
+
+.cell-lines-horizontal rect:nth-child(3) {
+  transform: translateY(160px);
+}
+
+.cell-lines-horizontal rect:nth-child(4) {
+  transform: translateY(240px);
+}
+
+.cell-lines-horizontal rect:nth-child(5) {
+  transform: translateY(320px);
+}
+
+.cell-lines-horizontal rect:nth-child(6) {
+  transform: translateY(400px);
+}
+
+.cell-lines-horizontal rect:nth-child(7) {
+  transform: translateY(480px);
+}
+
+.cell-lines-horizontal rect:nth-child(8) {
+  transform: translateY(560px);
+}
+
+.cell-lines-horizontal rect:nth-child(9) {
+  transform: translateY(640px);
+}
+
+.cell-lines-vertical rect:nth-child(1) {
+  transform: translateX(0px);
+}
+
+.cell-lines-vertical rect:nth-child(2) {
+  transform: translateX(80px);
+}
+
+.cell-lines-vertical rect:nth-child(3) {
+  transform: translateX(160px);
+}
+
+.cell-lines-vertical rect:nth-child(4) {
+  transform: translateX(240px);
+}
+
+.cell-lines-vertical rect:nth-child(5) {
+  transform: translateX(320px);
+}
+
+.cell-lines-vertical rect:nth-child(6) {
+  transform: translateX(400px);
+}
+
+.cell-lines-vertical rect:nth-child(7) {
+  transform: translateX(480px);
+}
+
+.cell-lines-vertical rect:nth-child(8) {
+  transform: translateX(560px);
+}
+
+.cell-lines-vertical rect:nth-child(9) {
+  transform: translateX(640px);
+}
+
+.lines-horizontal {
+  transform: translateX(-1.5px);
+}
+.lines-horizontal rect {
+  height: 3px;
+  width: 723px;
+}
+
+.lines-horizontal rect:nth-child(1) {
+  transform: translateY(-1.5px);
+}
+
+.lines-horizontal rect:nth-child(2) {
+  transform: translateY(238.5px);
+}
+
+.lines-horizontal rect:nth-child(3) {
+  transform: translateY(478.5px);
+}
+
+.lines-horizontal rect:nth-child(4) {
+  transform: translateY(718.5px);
+}
+
+.lines-vertical {
+  transform: translateY(-1.5px);
+}
+.lines-vertical rect {
+  height: 723px;
+  width: 3px;
+}
+
+.lines-vertical rect:nth-child(1) {
+  transform: translateX(-1.5px);
+}
+
+.lines-vertical rect:nth-child(2) {
+  transform: translateX(238.5px);
+}
+
+.lines-vertical rect:nth-child(3) {
+  transform: translateX(478.5px);
+}
+
+.lines-vertical rect:nth-child(4) {
+  transform: translateX(718.5px);
+}

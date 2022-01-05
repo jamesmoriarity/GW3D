@@ -1,0 +1,160 @@
+@use 'sass:math';
+@import '../GlobalVars';
+
+.grid-container {
+    width: 70%;
+  }
+svg {
+  overflow: visible;
+  font-size: 35px;
+}
+  
+.cell-pencil-values {
+  transform: translate($squareDimension/2 + px, 26px);
+  font-size: 16px;
+  text-anchor: middle;
+}
+  .cell-center-values {
+    transform: translate(40px, 60px);
+    font-size: 20px;
+    text-anchor: middle;
+  }
+  
+  .cell-value {
+    transform: translate(40px, 55px);
+    font-size: 40px;
+    text-anchor: middle;
+    pointer-events: none;   
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  $buffer: 8;
+  $adjustedDimension: ($squareDimension - (2 * $buffer)) + px;
+  $translateValuePX: $buffer + px;
+  .mouse-trap {
+    transform:translate($translateValuePX, $translateValuePX);
+    width: $adjustedDimension;
+    height: $adjustedDimension;
+    fill: transparent;
+  }
+
+  $dashArray:8;
+  .mouse-trap.selected {
+    stroke:#995400;
+    stroke-width:2px;
+    rx:8; ry:8;
+    stroke-dasharray: $dashArray;
+    stroke-dashoffset: $dashArray * 5;
+    animation: dash 1s linear infinite;
+  }
+  @keyframes dash {
+    to {stroke-dashoffset: $dashArray; }
+  }
+
+  .cells-group {
+    fill: black;
+  }
+
+  
+  #control-panel .selected, .mode-selector button.selected{
+    background-color:lightgrey;
+  }
+  .color-control-panel > button{
+    height:20px;
+    width:20px;
+  }
+  button.clear{
+    width:50px;
+  }
+
+  .reset{
+    margin-top:25px;
+  }
+
+#invalid-grid-shapes{
+  fill:transparent;
+  & rect{
+    pointer-events: none;
+    opacity:1;
+    stroke-width: 5px;
+    stroke:orange;
+    fill: #ffb25b;
+    fill-opacity: 0.1;
+  }
+}
+
+#invalid-cells rect{
+  height: $squareDimension + px;
+  width: $squareDimension + px;
+  rx: 8;
+  ry: 8;
+  stroke:rgba(255, 145, 0, 0.925);
+}
+#invalid-boxes rect{
+  height: $squareDimension * 3 + px;
+  width: $squareDimension * 3 + px;
+}
+#invalid-rows rect{
+  height: $squareDimension * 1 + px;
+  width: $squareDimension * 9 + px;
+}
+#invalid-columns rect{
+  height: $squareDimension * 9 + px;
+  width: $squareDimension * 1 + px;
+}
+$cells: 80;
+  @for $i from 0 through $cells {
+    .cells-group g:nth-child(#{$i+1}), .cell-#{$i} {
+      transform: translate(($i % 9) * $squareDimension + px, math.floor($i / 9) * $squareDimension + px);
+    }
+}
+$boxes:8;
+@for $i from 0 through $boxes {
+  .box-#{$i} {
+    transform: translate(($i % 3) * 3 * $squareDimension + px, math.floor($i / 3) * 3 * $squareDimension + px);
+  }
+}
+$rows:8;
+@for $i from 0 through $boxes {
+  .row-#{$i} {
+    transform: translate(0px, $i  * $squareDimension + px);
+  }
+}
+$columns:8;
+@for $i from 0 through $boxes {
+  .column-#{$i} {
+    transform: translate(($i % 9) * $squareDimension + px, 0px);
+  }
+}
+
+
+.cell-background {
+  /* fill: rgb(231, 230, 230); */
+  fill: transparent;
+  height: 80px;
+  width: 80px;
+  stroke-width: 0px;
+  stroke: rgb(138, 138, 138);
+}
+
+  $bgColors:(
+    ".bg-light-pink": rgb(245, 98, 245),
+    ".bg-light-blue": #d5f5ff,
+    ".bg-light-yellow": lightyellow,
+    ".bg-light-green": lightgreen,
+    ".bg-light-orange": rgb(245, 223, 184),
+    ".bg-light-purple": rgb(198, 166, 250),
+    ".original": rgb(186, 242, 250),
+    ".cell-background.invalid":#ffe78f,
+    ".cell-background.original.invalid":rgb(129, 207, 219),
+  );
+  @each $name, $color in $bgColors {
+    #{$name}, #{$name}.original{
+      fill:$color;
+      background-color: $color;
+      color: $color;
+    }
+  }
+

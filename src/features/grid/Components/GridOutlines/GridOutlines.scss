@@ -1,0 +1,55 @@
+/* SASS */
+@use 'sass:math';
+@import '../GlobalVars';
+
+.outlines{
+    fill:black;
+}
+
+.cell-lines{
+    fill:gray;
+    & .cell-lines-horizontal>rect{
+        height:2px;
+        width:$squareDimension * 9 + px;
+    }
+    & .cell-lines-vertical>rect{
+        height:$squareDimension * 9 + px;
+        width:2px;
+    }
+}
+@for $i from 0 through 8 {
+    .cell-lines-horizontal rect:nth-child(#{$i+1}){
+      transform:translateY(($i * $squareDimension) + px)
+    }
+}
+@for $i from 0 through 8 {
+    .cell-lines-vertical rect:nth-child(#{$i+1}){
+      transform:translateX(($i * $squareDimension) + px)
+    }
+}
+
+  .lines-horizontal{
+    transform:translateX(-1.5px);
+    & rect{
+      height:3px;
+      width:723px;
+    }
+  }
+  
+  @for $i from 0 through 3 {
+    .lines-horizontal rect:nth-child(#{$i+1}){
+      transform:translateY((($i * $superDimension) - 1.5) + px)
+    }
+  }
+  .lines-vertical{
+    transform:translateY(-1.5px);
+    & rect{
+      height:723px;
+      width:3px;
+    }
+  }
+  @for $i from 0 through 3 {
+    .lines-vertical rect:nth-child(#{$i+1}){
+      transform:translateX((($i * $superDimension) - 1.5) + px)
+    }
+  }

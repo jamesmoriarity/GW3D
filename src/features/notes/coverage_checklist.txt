@@ -1,0 +1,22 @@
+CellBackground
+    test status: upgraded
+    setup:  spy on useAppSelectorSpy
+            spy selectCellBackgroundClassSpy 
+                with mockReturnValue = "bg-light-pink"
+
+    tests:  on render with mockId in props
+                calls useAppSelectorSpy [with action object] = 1 times
+                calls to selectCellBackgroundClassSpy = 2 times
+                    with mockId
+                renders a rect node
+                renderResult.container.querySelector("rect")
+                node.classList.contains(className)
+
+CellValue: updated
+
+  control panel
+    displays based on mode  
+    test mode selector  
+        on click, mode changes
+    test reset button
+        on click dispatches reset    
