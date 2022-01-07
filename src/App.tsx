@@ -4,40 +4,35 @@ import './App.css';
 import { selectState } from './features/grid/State/Selectors/GridStateSelectors';
 import { NameNotes } from './features/nameNotes/Components/NameNotes/NameNotes';
 import {gsap} from 'gsap'
+import { Vector3 } from 'three';
 
 export class App extends Component{
-  state:any = {cameraZ:0}
-  tl:GSAPTimeline = gsap.timeline()
+  
+  state:any = {cameraY:0, lookAtPos:new Vector3()}
   constructor(props:any){
     super(props)
-    this.state.cameraZ = 4
   }
-  cameraOut = (event:React.MouseEvent) => {
-    this.tl = gsap.timeline()
-    let obj = {nextCameraZ:this.state.cameraZ}
-
-    let tween = gsap.to(obj, {nextCameraZ:this.state.cameraZ + 5, onUpdate:()=>{this.setState({cameraZ:obj.nextCameraZ})}});
+  cameraOut = () => {
+    const nextCameraY = this.state.cameraY
+    let newLookAtPos = new Vector3(this.state.lookAtPos.x + 2, this.state.lookAtPos.y, this.state.lookAtPos.z)
+    this.setState({cameraY:nextCameraY, lookAtPos:newLookAtPos})
   }
-  cameraIn = (event:React.MouseEvent) => {
-    this.tl = gsap.timeline()
-    let obj = {nextCameraZ:this.state.cameraZ}
-    let tween = gsap.to(obj, {nextCameraZ:this.state.cameraZ -5, onUpdate:()=>{this.setState({cameraZ:obj.nextCameraZ})}});
+  cameraIn = () => {
+    const nextCameraY = this.state.cameraY
+    let newLookAtPos = new Vector3(this.state.lookAtPos.x - 2, this.state.lookAtPos.y, this.state.lookAtPos.z)
+    this.setState({cameraY:nextCameraY, lookAtPos:newLookAtPos})
   }
   render(){
     return (
       <div className="App">
-      <a onClick={(event:any)=>{
-        this.cameraOut(event);
-        }}>camera out</a>
-        <a onClick={(event:any)=>{
-          this.cameraIn(event);
-          }}>camera in</a>
+        camera: 
+        <span onClick={(event:any)=>{this.cameraOut()}}>out </span>
+        <span onClick={(event:any)=>{this.cameraIn()}}> in</span>
         <header className="App-header">
-          <NameNotes cameraZ={this.state.cameraZ} />
+          <NameNotes cameraY={this.state.cameraY} lookAtPos={this.state.lookAtPos} />
         </header>
       </div>
     );
   }
 }
-
 export default App;
