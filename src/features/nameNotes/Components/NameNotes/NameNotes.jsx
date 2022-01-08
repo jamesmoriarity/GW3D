@@ -23,8 +23,14 @@ export class NameNotes extends Component {
   }
   componentDidMount() {
     console.log('componentDidMount')
+    this.loadModel()
+    
+  }
+  loadModel = () => {
+    // when model is loaded call rebuild
     this.rebuildAndRenderScene()
   }
+  
   animateCamera = (targetPos, targetLookAtPos) => {
     let animationObject = {nextCameraX:this.cameraPos.x, nextCameraY:this.cameraPos.y, nextCameraZ:this.cameraPos.z, nextLAx:this.lookAtPos.x, nextLAy:this.lookAtPos.y, nextLAz:this.lookAtPos.z}
     let tween2 = gsap.to(animationObject, {
@@ -79,8 +85,9 @@ export class NameNotes extends Component {
     this.scene.add(light2);
     var light3 = new THREE.SpotLight(0x111199, 5, 100, 120);
     light3.castShadow = true;
-    light3.position.set(5, 5, 25);
+    light3.position.set(15, 5, 25);
     this.scene.add(light3);
+    this.scene.add( new THREE.AmbientLight(0x99ff99) );
   }
 
   addCube = (cubeX) => {
@@ -106,10 +113,10 @@ export class NameNotes extends Component {
   }
 
   setCamera = () => {
-    this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 1, 1000 );
-    this.camera.position.x = this.cameraPos.x;
-    this.camera.position.y = this.cameraPos.y;
-    this.camera.position.z = this.cameraPos.z;
+    if(!this.camera){
+      this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 1, 1000 );
+    }
+    this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z)
     this.camera.lookAt(this.lookAtPos)
     this.camera.updateMatrix()
   }
@@ -117,7 +124,6 @@ export class NameNotes extends Component {
   buildScene = () => {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color( 0x999999 );
-    this.scene.add( new THREE.AmbientLight(0xff0000) );
     this.setCamera()
     this.addLighting()
     this.addCubes()
