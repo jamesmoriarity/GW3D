@@ -30,7 +30,7 @@ export class NameNotes extends Component {
     // when model is loaded call rebuild
     this.rebuildAndRenderScene()
   }
-  
+
   animateCamera = (targetPos, targetLookAtPos) => {
     let animationObject = {nextCameraX:this.cameraPos.x, nextCameraY:this.cameraPos.y, nextCameraZ:this.cameraPos.z, nextLAx:this.lookAtPos.x, nextLAy:this.lookAtPos.y, nextLAz:this.lookAtPos.z}
     let tween2 = gsap.to(animationObject, {
@@ -75,19 +75,19 @@ export class NameNotes extends Component {
   }
 
   addLighting = () => {
-    var light = new THREE.SpotLight(0xff0000, 1, 90, 120);
-    light.position.set(-5, 20, 4);
+    var light = new THREE.SpotLight(0xFFA500, 2, 90, 120);
+    light.position.set(-5, 10, -4);
     light.castShadow = true;
     this.scene.add(light);
-    var light2 = new THREE.SpotLight(0x663399, 3, 90, 120);
+    var light2 = new THREE.SpotLight(0xff0000, 3, 90, 120);
     light2.position.set(-10, 20, 20);
     light2.castShadow = true;
     this.scene.add(light2);
     var light3 = new THREE.SpotLight(0x111199, 5, 100, 120);
     light3.castShadow = true;
-    light3.position.set(15, 5, 25);
+    light3.position.set(15, 15, 25);
     this.scene.add(light3);
-    this.scene.add( new THREE.AmbientLight(0x99ff99) );
+    this.scene.add( new THREE.AmbientLight(0xff00ff) );
   }
 
   addCube = (cubeX) => {
