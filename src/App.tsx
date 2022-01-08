@@ -8,28 +8,26 @@ import { Vector3 } from 'three';
 
 export class App extends Component{
   
-  state:any = {cameraY:0, lookAtPos:new Vector3()}
+  state:any = {lookAtPos:new Vector3(), cameraPos:new Vector3(0,2.75,7)}
   constructor(props:any){
     super(props)
   }
-  cameraOut = () => {
-    const nextCameraY = this.state.cameraY
-    let newLookAtPos = new Vector3(this.state.lookAtPos.x + 2, this.state.lookAtPos.y, this.state.lookAtPos.z)
-    this.setState({cameraY:nextCameraY, lookAtPos:newLookAtPos})
-  }
-  cameraIn = () => {
-    const nextCameraY = this.state.cameraY
-    let newLookAtPos = new Vector3(this.state.lookAtPos.x - 2, this.state.lookAtPos.y, this.state.lookAtPos.z)
-    this.setState({cameraY:nextCameraY, lookAtPos:newLookAtPos})
+  cameraPan = (direction:number) => {
+    let newCameraPos = this.state.cameraPos.clone()
+    newCameraPos.x += (1.5  * direction)
+    newCameraPos.y += (2.25  * direction)
+    newCameraPos.z += (1.25  * direction)
+    let newLookAtPos = this.state.lookAtPos.clone()
+    newLookAtPos.x += direction
+    this.setState({lookAtPos:newLookAtPos, cameraPos:newCameraPos})
   }
   render(){
     return (
       <div className="App">
-        camera: 
-        <span onClick={(event:any)=>{this.cameraOut()}}>out </span>
-        <span onClick={(event:any)=>{this.cameraIn()}}> in</span>
+        camera look: 
+        <span onClick={(event:any)=>{this.cameraPan(-1)}}> left</span>  -  <span onClick={(event:any)=>{this.cameraPan(1)}}>right </span>
         <header className="App-header">
-          <NameNotes cameraY={this.state.cameraY} lookAtPos={this.state.lookAtPos} />
+          <NameNotes cameraY={this.state.cameraPos.y} lookAtPos={this.state.lookAtPos} cameraPos={this.state.cameraPos} />
         </header>
       </div>
     );

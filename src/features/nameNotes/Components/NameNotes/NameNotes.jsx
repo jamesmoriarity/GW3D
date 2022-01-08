@@ -5,87 +5,136 @@ import * as THREE from "three";
 import { setTimeout } from "timers";
 import {gsap} from 'gsap'
 
-let cube, renderer, scene
-
 export class NameNotes extends Component {
+  scene = null
   camera = null
-  cameraY = 0
+  cameraPos = {x:0, y:0, z:0}
   lookAtPos = null
   constructor(props){
     super(props)
-    this.cameraY = props.cameraY
+    this.cameraY = props.cameraPos.y
     this.lookAtPos = props.lookAtPos
+    this.cameraPos = props.cameraPos
   }
   componentDidUpdate(){
-    if(this.props.cameraY !== this.cameraY || this.props.lookAtPos !== this.lookAtPos){
-      this.animateCamera(this.props.cameraY, this.props.lookAtPos)
+    if(this.props.cameraPos !== this.cameraPos || this.props.lookAtPos !== this.lookAtPos){
+      this.animateCamera(this.props.cameraPos, this.props.lookAtPos)
     }
   }
-
   componentDidMount() {
     console.log('componentDidMount')
-    this.renderScene()
+    this.rebuildAndRenderScene()
   }
-
-  animateCamera = (targetY, targetLookAtPos) => {
-    console.log('animateCamera')
-    let animationObject = {nextCameraY:this.cameraY, nextLAx:this.lookAtPos.x, nextLAy:this.lookAtPos.y, nextLAz:this.lookAtPos.z}
-    let tween = gsap.to(animationObject, {
-      nextCameraY:targetY, nextLAx:targetLookAtPos.x, nextLAy:targetLookAtPos.y, nextLAz:targetLookAtPos.z,
+  animateCamera = (targetPos, targetLookAtPos) => {
+    let animationObject = {nextCameraX:this.cameraPos.x, nextCameraY:this.cameraPos.y, nextCameraZ:this.cameraPos.z, nextLAx:this.lookAtPos.x, nextLAy:this.lookAtPos.y, nextLAz:this.lookAtPos.z}
+    let tween2 = gsap.to(animationObject, {
+      nextCameraX:targetPos.x,
+      nextCameraY:targetPos.y,
+      nextCameraZ:targetPos.z,
+      nextLAx:targetLookAtPos.x, 
+      nextLAy:targetLookAtPos.y, 
+      nextLAz:targetLookAtPos.z,
       onUpdate:()=>{
-        this.cameraY = animationObject.nextCameraY;
+        this.cameraPos.x = animationObject.nextCameraX;
+        this.cameraPos.y = animationObject.nextCameraY;
+        this.cameraPos.z = animationObject.nextCameraZ;
         this.lookAtPos.x = animationObject.nextLAx
         this.lookAtPos.y = animationObject.nextLAy
         this.lookAtPos.z = animationObject.nextLAz
-        this.renderScene()
+        this.rebuildAndRenderScene()
       }
     })
   }
 
-  renderScene = () => {
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x999999 );
-    this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 1, 1000 );
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    if(this.mount.childElementCount > 0){
-      this.mount.removeChild(this.mount.firstChild)
-    }
-    this.mount.appendChild( renderer.domElement );
-    scene.add( new THREE.AmbientLight(0xff0000) );
+  rebuildAndRenderScene = () => {
+    this.buildScene();
+    this.renderScene()
+  }
 
-    var light = new THREE.PointLight(0xff9999, 10, 40);
-    light.position.set(20, 20, 20);
-    scene.add(light);
-
-    var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+  addPlane = () => {
+    const geometry = new THREE.PlaneGeometry( 300, 300);
+    //const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );    
     var material = new THREE.MeshPhongMaterial({
-      ambient: 0x555555,
-      color: 0x555555,
+      ambient: 0x222299,
+      color: 0x222299,
       specular: 0xffffff,
-      shininess: 50,
+      shininess: 0,
       shading: THREE.SmoothShading
     });
-    var material2 = new THREE.MeshPhongMaterial({
+    var plane = new THREE.Mesh( geometry, material );
+    plane.receiveShadow = true
+    plane.position.y = -0.5
+    plane.rotateX( - Math.PI / 2);
+    this.scene.add( plane );
+  }
+
+  addLighting = () => {
+    var light = new THREE.SpotLight(0xff0000, 1, 90, 120);
+    light.position.set(-5, 20, 4);
+    light.castShadow = true;
+    this.scene.add(light);
+    var light2 = new THREE.SpotLight(0x663399, 3, 90, 120);
+    light2.position.set(-10, 20, 20);
+    light2.castShadow = true;
+    this.scene.add(light2);
+    var light3 = new THREE.SpotLight(0x111199, 5, 100, 120);
+    light3.castShadow = true;
+    light3.position.set(5, 5, 25);
+    this.scene.add(light3);
+  }
+
+  addCube = (cubeX) => {
+    var geometry = new THREE.BoxGeometry( 1, 1, 1,20,20,20 );
+    var material = new THREE.MeshPhongMaterial({
       ambient: 0x333333,
       color: 0x333333,
       specular: 0xffffff,
-      shininess: 20,
+      shininess: 10,
       shading: THREE.SmoothShading
     });
-    cube = new THREE.Mesh( geometry, material );
-    cube.rotation.x = 0.5
-    scene.add( cube );
+    var cube = new THREE.Mesh( geometry, material );
+    cube.castShadow = true;
+    cube.receiveShadow = true;
+    cube.position.x = cubeX
+    this.scene.add( cube );
+  }
 
-    var cube2 = new THREE.Mesh( geometry, material2 );
-    cube2.rotation.x = 0.5
-    cube2.position.x = 2
-    scene.add( cube2 );
-    this.camera.position.y = this.cameraY;
-    this.camera.position.z = 6
+  addCubes = () => {
+    for(let i = -3; i < 3; i++){
+      this.addCube(i*1.5);
+    }
+  }
+
+  setCamera = () => {
+    this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 1, 1000 );
+    this.camera.position.x = this.cameraPos.x;
+    this.camera.position.y = this.cameraPos.y;
+    this.camera.position.z = this.cameraPos.z;
     this.camera.lookAt(this.lookAtPos)
     this.camera.updateMatrix()
-    renderer.render( scene, this.camera );
+  }
+
+  buildScene = () => {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color( 0x999999 );
+    this.scene.add( new THREE.AmbientLight(0xff0000) );
+    this.setCamera()
+    this.addLighting()
+    this.addCubes()
+    this.addPlane()
+
+  }
+
+  renderScene = () => {
+    var renderer = new THREE.WebGLRenderer();
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    if(this.mount && this.mount.childElementCount > 0){
+      this.mount.removeChild(this.mount.firstChild)
+    }
+    this.mount.appendChild( renderer.domElement );
+    renderer.render( this.scene, this.camera );
   }
 
   render() {
