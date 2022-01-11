@@ -53,6 +53,7 @@ export class NameNotes extends Component {
   camera = null
   cameraPos = {x:0, y:0, z:12}
   lookAtPos = null
+  notePos = null
   targetLookAtPos = null
   lightIntensity = 2
   lightIntensityTween = null
@@ -68,6 +69,7 @@ export class NameNotes extends Component {
   constructor(props){
     super(props)
     this.lookAtPos = props.lookAtPos.clone()
+    this.notePos = props.notePos.clone()
     this.targetLookAtPos = props.lookAtPos.clone()
     this.originalLookAtPosition = this.lookAtPos.clone()
     this.cameraPos = props.cameraPos
@@ -75,16 +77,16 @@ export class NameNotes extends Component {
     this.cubeCount = this.props.cubeCount
     this.guitarRotation = this.props.guitarRotation
     this.indicatorRef = createRef()
-  }
-
-  componentDidMount(){
-    
+    // props.notePos exists
   }
   componentDidUpdate(){
     console.log('componentDidUpdate')
-    let targetLookAtPos = this.props.lookAtPos.clone()
-    if(!this.props.cameraPos.equals(this.cameraPos) || !targetLookAtPos.equals(this.lookAtPos)){
-      this.animateCamera(this.props.cameraPos.clone(), targetLookAtPos)
+    if(!this.props.notePos.equals(this.notePos)){
+      this.notePos = this.props.notePos.clone() // handle change in note position
+      this.rebuildAndRenderScene()
+    }
+    if(!this.props.cameraPos.equals(this.cameraPos) || !this.props.lookAtPos.equals(this.lookAtPos)){
+      this.animateCamera(this.props.cameraPos.clone(), this.props.lookAtPos)
     }
     if(this.lightIntensity !== this.props.lightIntensity){
       this.animateLightIntensity(this.props.lightIntensity)
@@ -100,9 +102,7 @@ export class NameNotes extends Component {
     }
     var width = window.innerWidth, height = window.innerHeight;
     var widthHalf = width / 2, heightHalf = height / 2;
-    var ratX = height/width
-    var ratY = width/height
-    let pos = this.lookAtPos.clone()
+    let pos = this.notePos.clone()
     pos.project(this.camera)
     pos.x = ( pos.x/2 * width ) + widthHalf;
     pos.y = -( pos.y/2 * height ) + heightHalf;
@@ -110,24 +110,24 @@ export class NameNotes extends Component {
   }
   onModelLoaded = (gltf) => {
     this.gltf = gltf
-    this.state.gltf = gltf
+    this.state.gltf = gltf // debugging
     const scaleFactor = 2
     this.gltf.scene.scale.set(scaleFactor, scaleFactor, scaleFactor)
     this.gltf.scene.position.set(0,-1,0)   
     this.gltf.scene.rotateY(Math.PI/-2)   
     this.gltf.scene.rotateX(Math.PI/-.9) 
     this.gltf.scene.traverse(function(obj){
-      if(obj.type === 'Mesh'){
+/*       if(obj.type === 'Mesh'){
         const material = new THREE.MeshLambertMaterial( {
 						color: new THREE.Color().setHSL( .15, 0.25, 0.25 ),
 						side: THREE.DoubleSide,
             castShadow: true,
             receiveShadow: true
 					} 
-        );
+        ); 
         // obj.material = material;
         //obj.castShadow = true
-      }
+      }*/
     }); 
     this.rebuildAndRenderScene()
   }
@@ -145,8 +145,6 @@ export class NameNotes extends Component {
       }
     );
   }
-
-
   componentDidMount() {
     console.log('componentDidMount')
     this.loadModel(this)
@@ -199,15 +197,9 @@ export class NameNotes extends Component {
         this.lookAtPos.x = animationObject.nextLAx
         this.lookAtPos.y = animationObject.nextLAy
         this.lookAtPos.z = animationObject.nextLAz
-        // const [projectedCoordinates, centerCoordinates] = this.getProjectedPosition()
-        // this.indicatorRef.current.updateCoordinates(projectedCoordinates, centerCoordinates)
         this.rebuildAndRenderScene()
       },
       onComplete:()=>{
-        console.log('onComplete')
-        this.camera.updateProjectionMatrix()
-        const [projectedCoordinates, centerCoordinates] = this.getProjectedPosition()
-        this.indicatorRef.current.updateCoordinates(projectedCoordinates, centerCoordinates)
         this.rebuildAndRenderScene()
       }
     })
@@ -262,7 +254,7 @@ export class NameNotes extends Component {
     });
     this.cube = new THREE.Mesh( geometry, material );
     
-    this.cube.position.set(this.lookAtPos.x, this.lookAtPos.y, this.lookAtPos.z)
+    this.cube.position.set(this.notePos.x, this.notePos.y, this.notePos.z)
     this.scene.add( this.cube );
   }
 
@@ -277,8 +269,7 @@ export class NameNotes extends Component {
     this.camera = new THREE.PerspectiveCamera(14, window.innerWidth/window.innerHeight, 1, 1000 );
     this.scene.add(this.camera)
     this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z)
-    // this.camera.lookAt(this.originalLookAtPosition)
-    this.camera.lookAt(this.originalLookAtPosition)
+    this.camera.lookAt(this.lookAtPos)
     this.camera.updateProjectionMatrix()
   }
   addModel = () => {
@@ -288,7 +279,7 @@ export class NameNotes extends Component {
   }
 
   addGrid = () => {
-    return
+    // return
     var green = new THREE.Color(0x00ff00)
     var red = new THREE.Color(0x990000)
     var blue = new THREE.Color(0x004466)
