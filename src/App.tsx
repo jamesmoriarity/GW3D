@@ -1,9 +1,10 @@
-import { Component } from 'react';
+import { Component, createRef, CSSProperties, useRef } from 'react';
 import './App.css';
 import { NameNotes } from './features/nameNotes/Components/NameNotes/NameNotes';
-import { Vector3 } from 'three';
+import { Vector2, Vector3 } from 'three';
 import DatGui, { DatFolder, DatNumber} from 'react-dat-gui';
 import { objectTraps } from '@reduxjs/toolkit/node_modules/immer/dist/internal';
+import React from 'react';
 
 export interface DatSettingsProps{
   data:any,
@@ -19,29 +20,31 @@ export class DatSettings extends Component{
               <DatNumber path='lightIntensity' label='Light Intensity' min={0} max={10} step={0.25} />
               <DatNumber path='cubeCount' label='Number of Cubes' min={0} max={10} step={1} />
               <DatFolder title='Camera Position' closed={true}>
-                <DatNumber path='cameraPos.x' label='Camera X' min={-10} max={10} step={0.5} />
-                <DatNumber path='cameraPos.y' label='Camera Y' min={0} max={40} step={0.5} />
-                <DatNumber path='cameraPos.z' label='Camera Z' min={-10} max={10} step={0.5} />
+                <DatNumber path='cameraPos.x' label='Camera X' min={-40} max={40} step={4} />
+                <DatNumber path='cameraPos.y' label='Camera Y' min={-40} max={40} step={4} />
+                <DatNumber path='cameraPos.z' label='Camera Z' min={-40} max={40} step={4} />
               </DatFolder>
               <DatFolder title='Camera Look At' closed={true}>
                 <DatNumber path='lookAtPos.x' label='X' min={-10} max={10} step={0.5} />
-                <DatNumber path='lookAtPos.y' label='Y' min={0} max={40} step={0.5} />
+                <DatNumber path='lookAtPos.y' label='Y' min={-100} max={40} step={0.5} />
                 <DatNumber path='lookAtPos.z' label='Z' min={-10} max={10} step={0.5} />
               </DatFolder>
             </DatGui>
   }
 }
 export class App extends Component{
-  state:any = {
-    lookAtPos:new Vector3(-0.5, 1, 0), 
-    cameraPos:new Vector3(0, 1, 3),
-    guitarRotation:new Vector3(-0.75,-0.5,0),
+  ref:any = null
+  state:any = { 
+    cameraPos:new Vector3(0.5, 0, 12),
+    lookAtPos:new Vector3(0, 0, 0.3),
+    guitarRotation:new Vector3(0,0,16),
     lightIntensity:1,
-    cubeCount:0,
+    cubeCount:1
   }
   constructor(props:any){
     super(props)
   }
+
   handleUpdate = (newData:any) => {
     this.setState(
       {
@@ -52,11 +55,10 @@ export class App extends Component{
       })
   }
   render(){
-    // console.log('render')
     return (
       <div className="App">
         <DatSettings data={{...this.state}} handleUpdate={this.handleUpdate}/>
-        <NameNotes 
+        <NameNotes
           cubeCount={this.state.cubeCount} 
           lightIntensity={this.state.lightIntensity} 
           lookAtPos={this.state.lookAtPos} 
