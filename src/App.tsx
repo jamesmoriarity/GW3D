@@ -18,7 +18,7 @@ export class DatSettings extends Component{
   render(){
     const smallStep = 0.01
     const bigStep = 0.5
-    const xlStep = 4
+    const xlStep = 2.5
     return  <DatGui data={this.props.data} onUpdate={this.props.handleUpdate}>
               <DatNumber path='lightIntensity' label='Light Intensity' min={0} max={10} step={bigStep} />
               <DatNumber path='cubeCount' label='Number of Cubes' min={0} max={10} step={1} />
@@ -28,9 +28,9 @@ export class DatSettings extends Component{
                 <DatNumber path='cameraPos.z' label='Camera Z' min={-40} max={40} step={xlStep} />
               </DatFolder>
               <DatFolder title='Camera Look At' closed={true}>
-                <DatNumber path='lookAtPos.x' label='X' min={-10} max={10} step={smallStep} />
-                <DatNumber path='lookAtPos.y' label='Y' min={-100} max={40} step={smallStep} />
-                <DatNumber path='lookAtPos.z' label='Z' min={-10} max={40} step={smallStep} />
+                <DatNumber path='lookAtPos.x' label='X' min={-10} max={10} step={bigStep} />
+                <DatNumber path='lookAtPos.y' label='Y' min={-100} max={40} step={bigStep} />
+                <DatNumber path='lookAtPos.z' label='Z' min={-10} max={40} step={bigStep} />
               </DatFolder>
               <DatFolder title='Note Position' closed={true}>
                 <DatNumber path='notePos.x' label='X' min={-10} max={10} step={smallStep} />

@@ -77,22 +77,83 @@ export class NameNotes extends Component {
     this.cubeCount = this.props.cubeCount
     this.guitarRotation = this.props.guitarRotation
     this.indicatorRef = createRef()
+    this.lights = []
     // props.notePos exists
   }
+  updateScene(){
+    this.updateCamera()
+    this.updateSphere()
+    this.updateLighting()
+  }
+  buildScene = () => {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color( 0x9999bb );
+    this.buildCamera()
+    this.buildSphere()
+    this.buildLighting()
+    this.addGrid()
+    this.updateScene()
+  }
+  buildCamera = () => {
+    this.camera = new THREE.PerspectiveCamera(14, window.innerWidth/window.innerHeight, 1, 1000 );
+    this.scene.add(this.camera)
+    this.updateCamera()
+  }
+  updateCamera = () => {
+    this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z)
+    this.camera.lookAt(this.lookAtPos)
+    this.camera.updateProjectionMatrix()
+  }
+  updateSphere = () => {
+    this.sphere.position.set(this.notePos.x, this.notePos.y, this.notePos.z)
+  }
+  buildSphere = () => {
+    var geometry = new THREE.SphereGeometry( .025, 100, 100 );
+    var material = new THREE.MeshPhongMaterial({
+      ambient: 0x663333,
+      color: 0x336633,
+      specular: 0xffffff,
+      shininess: 10,
+      flatShading:true
+    });
+    this.sphere = new THREE.Mesh( geometry, material );
+    this.scene.add( this.sphere );
+    this.updateSphere()
+  }
+  updateLighting = () => {
+    this.lights.forEach(element=>{element.intensity = this.lightIntensity})
+  }
+  buildLighting = () => {
+    var light2 = new THREE.SpotLight(0xFFCC00, this.lightIntensity, 100, 40);
+    light2.position.set(10, -20, 20);
+    light2.castShadow = true;
+    this.scene.add(light2);
+    this.lights[0] = light2
+
+    var light3 = new THREE.SpotLight(0x333333, this.lightIntensity, 100, 40);
+    light3.castShadow = true;
+    light3.position.set(15, 20, 25);
+    this.scene.add(light3);
+    this.lights[2] = light3
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, this.lightIntensity)
+    this.scene.add(ambientLight);
+    this.lights[2] = light3
+
+    const lighth = new THREE.HemisphereLight( 0xffffff, 0x000066, this.lightIntensity );
+    this.scene.add( lighth );
+    this.lights[3] = lighth
+  }
   componentDidUpdate(){
-    console.log('componentDidUpdate')
     if(!this.props.notePos.equals(this.notePos)){
       this.notePos = this.props.notePos.clone() // handle change in note position
-      this.rebuildAndRenderScene()
+      this.updateAndRenderScene()
     }
     if(!this.props.cameraPos.equals(this.cameraPos) || !this.props.lookAtPos.equals(this.lookAtPos)){
       this.animateCamera(this.props.cameraPos.clone(), this.props.lookAtPos)
     }
     if(this.lightIntensity !== this.props.lightIntensity){
       this.animateLightIntensity(this.props.lightIntensity)
-    }
-    if(this.cubeCount !== this.props.cubeCount){
-      this.rebuildAndRenderScene()
     }
   }
   getProjectedPosition = () => {
@@ -129,9 +190,9 @@ export class NameNotes extends Component {
         //obj.castShadow = true
       }*/
     }); 
-    this.rebuildAndRenderScene()
+    this.scene.add(this.gltf.scene)
+    this.renderScene()
   }
-
   loadModel = (comp) => {
     const loader = new GLTFLoader();
     loader.load(
@@ -146,12 +207,10 @@ export class NameNotes extends Component {
     );
   }
   componentDidMount() {
-    console.log('componentDidMount')
-    this.loadModel(this)
+    this.buildScene()
+    this.loadModel()
   }
-
   animateLightIntensity = (targetIntensity) => {
-    console.log('animateLightIntensity')
     if(this.lightIntensityTween){
       this.lightIntensityTween.kill()
     }
@@ -160,12 +219,12 @@ export class NameNotes extends Component {
       {
         lightIntensity:targetIntensity,
         onUpdate:()=>{
-          this.rebuildAndRenderScene()
+          this.updateLighting()
+          this.renderScene()
         }
       }
     )
   }
-
   animateCamera = (targetPos, targetLookAtPos) => {
     console.log('animateCamera')
 /*     this.cameraPos.x = targetPos.x;
@@ -197,87 +256,17 @@ export class NameNotes extends Component {
         this.lookAtPos.x = animationObject.nextLAx
         this.lookAtPos.y = animationObject.nextLAy
         this.lookAtPos.z = animationObject.nextLAz
-        this.rebuildAndRenderScene()
+        this.updateAndRenderScene()
       },
       onComplete:()=>{
-        this.rebuildAndRenderScene()
+        this.updateAndRenderScene()
       }
     })
   }
-
-  rebuildAndRenderScene = () => {
-    this.buildScene();
+  updateAndRenderScene = () => {
+    this.updateScene();
     this.renderScene()
   }
-
-  addPlane = () => {
-    return 
-    const geometry = new THREE.PlaneGeometry( 300, 300);
-    //const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );    
-    var material = new THREE.MeshPhongMaterial({
-      ambient: 0x222299,
-      color: 0x222299,
-      specular: 0xffffff,
-      shininess: 0,
-      shading: THREE.SmoothShading
-    });
-    var plane = new THREE.Mesh( geometry, material );
-    plane.receiveShadow = true
-    plane.castShadow = true
-    plane.position.y = -0.1
-    plane.rotateX( - Math.PI / 2);
-    this.scene.add( plane );
-  }
-
-  addLighting = () => {
-    var light2 = new THREE.SpotLight(0xFFCC00, this.lightIntensity, 100, 40);
-    light2.position.set(10, -20, 20);
-    light2.castShadow = true;
-    this.scene.add(light2);
-    var light3 = new THREE.SpotLight(0x333333, this.lightIntensity, 100, 40);
-    light3.castShadow = true;
-    light3.position.set(15, 20, 25);
-    this.scene.add(light3);
-    this.scene.add( new THREE.AmbientLight(0xffffff, this.lightIntensity) );
-    const lighth = new THREE.HemisphereLight( 0xffffff, 0x000066, this.lightIntensity );
-    this.scene.add( lighth );
-  }
-
-  addCube = () => {
-    var geometry = new THREE.SphereGeometry( .025, 100, 100 );
-    var material = new THREE.MeshPhongMaterial({
-      ambient: 0x663333,
-      color: 0x336633,
-      specular: 0xffffff,
-      shininess: 10,
-      flatShading:true
-    });
-    this.cube = new THREE.Mesh( geometry, material );
-    
-    this.cube.position.set(this.notePos.x, this.notePos.y, this.notePos.z)
-    this.scene.add( this.cube );
-  }
-
-  addCubes = () => {
-    const cc = this.props.cubeCount
-    for(let i = 0; i < 1; i++){
-      this.addCube();
-    }
-  }
-
-  setCamera = () => {
-    this.camera = new THREE.PerspectiveCamera(14, window.innerWidth/window.innerHeight, 1, 1000 );
-    this.scene.add(this.camera)
-    this.camera.position.set(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z)
-    this.camera.lookAt(this.lookAtPos)
-    this.camera.updateProjectionMatrix()
-  }
-  addModel = () => {
-    if(this.gltf){
-      this.scene.add(this.gltf.scene)
-    }
-  }
-
   addGrid = () => {
     // return
     var green = new THREE.Color(0x00ff00)
@@ -302,19 +291,6 @@ export class NameNotes extends Component {
     var axes = new THREE.AxisHelper(6);
     this.scene.add(axes);
   }
-
-  buildScene = () => {
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color( 0x9999bb );
-    this.addCubes()
-    this.setCamera()
-    this.addLighting()
-    this.addPlane()
-    this.addModel()
-    this.addGrid()
-
-  }
-
   renderScene = () => {
     var renderer = new THREE.WebGLRenderer();
     renderer.outputEncoding = THREE.sRGBEncoding;
@@ -329,7 +305,6 @@ export class NameNotes extends Component {
     const [projectedCoordinates, centerCoordinates] = this.getProjectedPosition()
     this.indicatorRef.current.updateCoordinates(projectedCoordinates, centerCoordinates)
   }
-
   render() {
     const [projectedCoordinates, centerCoordinates] = this.getProjectedPosition()
     return (
