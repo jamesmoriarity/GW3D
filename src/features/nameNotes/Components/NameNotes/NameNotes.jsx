@@ -21,7 +21,6 @@ export class Indicator extends Component {
       this.setState({projectedCoordinates:projectedCoordinates, centerCoordinates:centerCoordinates})
   }
   componentDidUpdate(){
-    console.log('Indicator.componentDidUpdate')
   }
 
   render(){
@@ -61,7 +60,7 @@ export class NameNotes extends Component {
   guitarRotation = null
   state = {gltf:null}
   cameraTween = null
-  showGrid = true
+  showGrid = false
   neck = null
   originalLookAtPosition = null
   ref = null
@@ -78,6 +77,7 @@ export class NameNotes extends Component {
     this.guitarRotation = this.props.guitarRotation
     this.indicatorRef = createRef()
     this.lights = []
+    this.showGrid = this.props.showGrid
     // props.notePos exists
   }
   updateScene(){
@@ -87,11 +87,14 @@ export class NameNotes extends Component {
   }
   buildScene = () => {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color( 0x9999bb );
+    this.scene.background = new THREE.Color( 0x221122 );
     this.buildCamera()
     this.buildSphere()
     this.buildLighting()
     this.addGrid()
+    if(this.gltf && this.gltf.scene){
+      this.scene.add(this.gltf.scene)
+    }
     this.updateScene()
   }
   buildCamera = () => {
@@ -155,9 +158,13 @@ export class NameNotes extends Component {
     if(this.lightIntensity !== this.props.lightIntensity){
       this.animateLightIntensity(this.props.lightIntensity)
     }
+    if(this.showGrid != this.props.showGrid){
+      this.showGrid = this.props.showGrid
+      this.buildScene()
+      this.updateAndRenderScene()
+    }
   }
   getProjectedPosition = () => {
-    console.log('getProjectedPosition')
     if(!this.camera){
       return [ new Vector2(0,0), new Vector2(0,0) ]
     }
@@ -226,7 +233,6 @@ export class NameNotes extends Component {
     )
   }
   animateCamera = (targetPos, targetLookAtPos) => {
-    console.log('animateCamera')
 /*     this.cameraPos.x = targetPos.x;
     this.cameraPos.y = targetPos.y;
     this.cameraPos.z = targetPos.z
@@ -268,7 +274,7 @@ export class NameNotes extends Component {
     this.renderScene()
   }
   addGrid = () => {
-    // return
+    if(!this.props.showGrid){return}
     var green = new THREE.Color(0x00ff00)
     var red = new THREE.Color(0x990000)
     var blue = new THREE.Color(0x004466)
