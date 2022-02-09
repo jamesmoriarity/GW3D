@@ -27,13 +27,15 @@ export class Indicator extends Component {
           position: 'absolute',
           left: this.state.projectedCoordinates.x,
           top: this.state.projectedCoordinates.y,
-          border: '1px solid red'
+          border: '1px solid red',
+          display:'none'
       };
       const centerStyle = {
           position: 'absolute',
           left: this.state.centerCoordinates.x,
           top: this.state.centerCoordinates.y,
-          border: '1px solid orange'
+          border: '1px solid orange',
+          display:'none'
       };
       return  <div>
                 <div style={projectedStyle}>
@@ -80,29 +82,62 @@ export class NameNotes extends Component {
     this.lights = []
     this.showGrid = this.props.showGrid
     this.sceneHelper = new SceneHelper(this)
+    this.makeNewTimeline()
     // props.notePos exists
   }
- 
+
+  makeNewTimeline = () => {
+    if(this.animationTimeline){
+      this.animationTimeline.kill()
+    }
+    this.animationTimeline = gsap.timeline({
+      autoRemoveChildren:true,
+      callbackScope:this, 
+      paused:true, 
+      onComplete:this.onAnimationComplete, 
+      smoothChildTiming:true
+    })
+  }
+  onAnimationComplete = () =>{
+    console.log('onAnimationComplete')
+    console.log('number of children: ' + this.animationTimeline.getChildren().length)
+    this.makeNewTimeline();
+  }
   componentDidUpdate(){
+
+    console.log('componentDidUpdate!!!')
+    if(this.animationTimeline){
+      this.animationTimeline.kill()
+      this.makeNewTimeline()
+    }
+    let updateAndRender = false
     if(!this.props.notePos.equals(this.notePos)){
       this.notePos = this.props.notePos.clone() // handle change in note position
-      this.sceneHelper.updateAndRenderScene()
+      updateAndRender = true
     }
-    if(!this.props.cameraPos.equals(this.cameraPos) || !this.props.lookAtPos.equals(this.lookAtPos)){
-      this.animateCamera(this.props.cameraPos.clone(), this.props.lookAtPos)
-    }
-    if(this.lightIntensity !== this.props.lightIntensity){
-      this.animateLightIntensity(this.props.lightIntensity)
-    }
+    let cameraChange = (!this.props.cameraPos.equals(this.cameraPos) || !this.props.lookAtPos.equals(this.lookAtPos))
+    if(cameraChange){ this.animateCamera(this.props.cameraPos.clone(), this.props.lookAtPos) }
+    let lightingIntensityChange = (this.lightIntensity !== this.props.lightIntensity)
+    if(lightingIntensityChange){this.animateLightIntensity(this.props.lightIntensity)}
     if(this.lightColor !== this.props.lightColor){
       this.lightColor = this.props.lightColor
-      this.sceneHelper.updateAndRenderScene()
+      updateAndRender = true
     }
-    if(this.showGrid != this.props.showGrid){
+    if(this.showGrid !== this.props.showGrid){
       this.showGrid = this.props.showGrid
       this.sceneHelper.buildScene()
+      updateAndRender = true
+    }
+    let hasAnimationsToRun = (this.animationTimeline.getChildren().length > 0)
+    if(hasAnimationsToRun){
+      this.animationTimeline.restart()
+    }
+    if(updateAndRender){
       this.sceneHelper.updateAndRenderScene()
     }
+    // if the master timeline has something in it then run it and 
+    // call an onComplete method that publishes updated 3D positions as 2D coordinate
+    // 
   }
   getProjectedPosition = () => {
     if(!this.camera){
@@ -119,12 +154,10 @@ export class NameNotes extends Component {
 
   componentDidMount() {
     this.sceneHelper.buildScene()
+    this.set2DCoordinates()
     this.sceneHelper.loadModel()
   }
   animateLightIntensity = (targetIntensity) => {
-    if(this.lightIntensityTween){
-      this.lightIntensityTween.kill()
-    }
     this.lightIntensityTween = gsap.to(
       this, 
       {
@@ -135,9 +168,13 @@ export class NameNotes extends Component {
         }
       }
     )
+    this.animationTimeline.add(this.lightIntensityTween)
+  }
+  set2DCoordinates = () => {
+    const [projectedCoordinates, centerCoordinates] = this.getProjectedPosition()
+    this.indicatorRef.current.updateCoordinates(projectedCoordinates, centerCoordinates)
   }
   animateCamera = (targetPos, targetLookAtPos) => {
-    if(this.cameraTween){this.cameraTween.kill()}
     let animationObject = {nextCameraX:this.cameraPos.x, nextCameraY:this.cameraPos.y, nextCameraZ:this.cameraPos.z, nextLAx:this.lookAtPos.x, nextLAy:this.lookAtPos.y, nextLAz:this.lookAtPos.z}
     this.cameraTween = gsap.to(animationObject, {
       nextCameraX:targetPos.x,
@@ -155,11 +192,13 @@ export class NameNotes extends Component {
         this.lookAtPos.y = animationObject.nextLAy
         this.lookAtPos.z = animationObject.nextLAz
         this.sceneHelper.updateAndRenderScene()
+        this.set2DCoordinates()
       },
       onComplete:()=>{
-        this.sceneHelper.updateAndRenderScene()
+        this.set2DCoordinates()
       }
     })
+    this.animationTimeline.add(this.cameraTween)
   }
 
   render() {

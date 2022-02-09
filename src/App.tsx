@@ -1,10 +1,9 @@
-import { Component, createRef, CSSProperties, useRef } from 'react';
+import { Component} from 'react';
 import './App.css';
 import { NameNotes } from './features/nameNotes/Components/NameNotes/NameNotes';
-import { Vector2, Vector3 } from 'three';
+import { Vector3 } from 'three';
 import DatGui, { DatBoolean, DatColor, DatFolder, DatNumber} from 'react-dat-gui';
-import { objectTraps } from '@reduxjs/toolkit/node_modules/immer/dist/internal';
-import React from 'react';
+import { Tester } from './features/nameNotes/Components/Tester';
 
 export interface DatSettingsProps{
   data:any,
@@ -22,7 +21,7 @@ export class DatSettings extends Component{
     return  <DatGui data={this.props.data} onUpdate={this.props.handleUpdate}>
               <DatFolder title='Lighting' closed={true}>
                 <DatColor path='lightColor' label='Color'/>
-                <DatNumber path='lightIntensity' label='Intensity' min={0} max={10} step={bigStep} />
+                <DatNumber path='lightIntensity' label='Intensity' min={0} max={10} step={0.2} />
               </DatFolder>
               <DatFolder title='Camera Position' closed={true}>
                 <DatNumber path='cameraPos.x' label='Camera X' min={-40} max={40} step={xlStep} />
@@ -43,14 +42,13 @@ export class DatSettings extends Component{
   }
 }
 export class App extends Component{
-  ref:any = null
   state:any = { 
-    cameraPos:new Vector3(0, 0, 8),
-    lookAtPos:new Vector3(.555, -.10, 0.35),
-    notePos:new Vector3(0,0,0.28),
+    cameraPos:new Vector3(-2.5, 0, 2.5),
+    lookAtPos:new Vector3(0, 0, 0.5),
+    notePos:new Vector3(-0.05,0.23,0.32),
     guitarRotation:new Vector3(0,0,16),
     showGrid:false,
-    lightIntensity:1,
+    lightIntensity:1.5,
     lightColor:'#C57917',
     cubeCount:1
   }
@@ -72,6 +70,7 @@ export class App extends Component{
   render(){
     return (
       <div className="App">
+        <Tester/>
         <DatSettings data={{...this.state}} handleUpdate={this.handleUpdate}/>
         <NameNotes
           showGrid={this.state.showGrid} 
